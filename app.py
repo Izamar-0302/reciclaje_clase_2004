@@ -5,22 +5,21 @@ import streamlit as st
 import tensorflow as tf
 from PIL import Image
 
-st.set_page_config(page_title = "Reciclaje IA_ISC", layout = "centered")
-st.title("Modelo predictivo Reciclaje clase de IA-ISC-Campus Comayagua-2026 Angeles Euceda")
-st.write("Suba una imagen para clasificar con el modelo Mobilenet V2 pre entrenado")
+st.set_page_config(page_title="Clasificación de Flores IA_ISC", layout="centered")
+st.title("Modelo predictivo de Clasificación de Flores - IA-ISC-Campus Comayagua-2026 Angeles Euceda")
+st.write("Suba una imagen de una flor para clasificar con el modelo Mobilenet V2 pre entrenado")
 
-IMG_SIZE = (224,224)
-MODEL_DIR = Path("modelo_reciclaje_mobilenet")
-CLASS_PATH = MODEL_DIR/"class_names.json"
-MODEL_PATHS = [MODEL_DIR/"waste_mobilenet.keras", MODEL_DIR/"waste_mobilenet.h5"]
+IMG_SIZE = (224, 224)
+MODEL_DIR = Path("modelo_flores_mobilenet")
+CLASS_PATH = MODEL_DIR / "class_names.json"
+MODEL_PATHS = [MODEL_DIR / "flowers_mobilenet.keras", MODEL_DIR / "flowers_mobilenet.h5"]
 
-LABELS_ES={
-  "cardboard": "Cartón",
-    "glass": "Vidrio",
-    "metal": "Metal",
-    "paper": "Papel",
-    "plastic": "Plástico",
-    "trash": "Basura"
+LABELS_ES = {
+    "daisy": "Margarita",
+    "dandelion": "Diente de León",
+    "rose": "Rosa",
+    "sunflower": "Girasol",
+    "tulip": "Tulipán"
 }
 
 @st.cache_resource
@@ -28,7 +27,7 @@ def cargar_modelo():
     for path in MODEL_PATHS:
         if path.exists():
             return tf.keras.models.load_model(path, compile=False)
-    st.error("No se encontró el modelo. Coloque la carpeta modelo_reciclaje_mobilenet junto a app.py.")
+    st.error("No se encontró el modelo. Coloque la carpeta modelo_flores_mobilenet junto a app.py.")
     st.stop()
 
 @st.cache_data
@@ -36,7 +35,7 @@ def cargar_clases():
     if CLASS_PATH.exists():
         with open(CLASS_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
-    return ["cardboard", "glass", "metal", "paper", "plastic", "trash"]
+    return ["daisy", "dandelion", "rose", "sunflower", "tulip"]
 
 
 def preparar_imagen(img):
@@ -56,7 +55,7 @@ def predecir(img):
 modelo = cargar_modelo()
 clases = cargar_clases()
 
-archivo = st.file_uploader("Seleccione una imagen", type=["jpg", "jpeg", "png"])
+archivo = st.file_uploader("Seleccione una imagen de una flor", type=["jpg", "jpeg", "png"])
 
 if archivo:
     imagen = Image.open(archivo)
@@ -70,4 +69,4 @@ if archivo:
     for clase, prob in resultados:
         st.write(f"{clase}: {prob:.2f}%")
 else:
-    st.info("Cargue una imagen para iniciar la clasificación.")
+    st.info("Cargue una imagen de una flor para iniciar la clasificación.")
